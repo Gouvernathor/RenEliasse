@@ -1,4 +1,5 @@
-﻿define config.rollback_enabled = False
+﻿define config.allow_skipping = False
+define config.rollback_enabled = False
 
 label main_menu:
 return
