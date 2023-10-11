@@ -11,6 +11,9 @@ init offset = -2
 init python:
     gui.init(1920, 1080)
 
+    config.font_replacement_map['humanist-521-bt.ttf', True, False] = ('humanist-521-bold-bt.ttf', False, False)
+    config.font_replacement_map['marianne-regular-webfont.otf', True, False] = ('marianne-bold-webfont.otf', False, False)
+
 ## Active la vérification de propriétés invalides ou instables dans les screens
 ## et transforms
 define config.check_conflicting_properties = True
@@ -27,55 +30,58 @@ define config.check_conflicting_properties = True
 
 ## Une couleur utilisée dans l’interface pour mettre l’accent sur un texte
 ## (surbrillance).
-define gui.accent_color = '#cc0000'
+define gui.accent_color = '#990000'
 
 ## La couleur utilisée pour le texte d’un bouton quand il n’a jamais été
 ## sélectionné ou survolé.
-define gui.idle_color = '#888888'
+define gui.idle_color = '#aaaaaa'
 
 ## La petite couleur est utilisé pour les textes courts qui nécessitent d’être
 ## assombris ou éclairés pour obtenir le même effet.
-define gui.idle_small_color = '#aaaaaa'
+define gui.idle_small_color = '#888888'
 
 ## Cette couleur est utilisée pour les boutons et les barres qui sont survolées.
-define gui.hover_color = '#e06666'
+define gui.hover_color = '#009' # '#990000'
 
 ## Cette couleur est utilisé pour le texte d’un bouton sélectionné, mais qui n’a
 ## pas le focus. Un bouton est sélectionné s’il est sur l’écran actuel ou si
 ## c’est la valeur de préférence.
-define gui.selected_color = '#ffffff'
+define gui.selected_color = '#555555'
 
 ## La couleur utilisée pour le texte d’un bouton qui ne peut pas être
 ## sélectionné.
-define gui.insensitive_color = '#8888887f'
+define gui.insensitive_color = '#aaaaaa7f'
 
 ## Couleurs utilisées pour les portions de barres qui ne sont pas remplies.
 ## Elles ne sont pas utilisées directement, mais quand les fichiers d’images
 ## sont régénérés.
-define gui.muted_color = '#510000'
-define gui.hover_muted_color = '#7a0000'
+define gui.muted_color = '#c16666'
+define gui.hover_muted_color = '#d69999'
 
 ## Les couleurs utilisées pour les dialogues et les menus de choix.
-define gui.text_color = '#ffffff'
-define gui.interface_text_color = '#ffffff'
+define gui.text_color = '#404040'
+define gui.interface_text_color = '#404040'
 
 
 ## Polices et tailles de police ################################################
 
 ## Les polices utilisées pour le texte du jeu.
-define gui.text_font = "DejaVuSans.ttf"
+define gui.text_font = 'humanist-521-bt.ttf'
 
 ## Les polices utilisées pour le nom des personnages.
-define gui.name_text_font = "DejaVuSans.ttf"
+define gui.name_text_font = 'humanist-521-bt.ttf'
 
 ## Les polices utilisées pour les textes « hors du jeu ».
-define gui.interface_text_font = "DejaVuSans.ttf"
+define gui.interface_text_font = "marianne-regular-webfont.otf"
 
 ## La taille normale pour les dialogues.
 define gui.text_size = 33
 
 ## La taille pour le nom des personnages.
 define gui.name_text_size = 45
+
+## La couleur pour le nom des personnages.
+define gui.name_text_color = '#009'
 
 ## La taille du texte dans l’interface de jeu.
 define gui.interface_text_size = 33
@@ -221,9 +227,9 @@ define gui.choice_button_borders = Borders(150, 8, 150, 8)
 define gui.choice_button_text_font = gui.text_font
 define gui.choice_button_text_size = gui.text_size
 define gui.choice_button_text_xalign = 0.5
-define gui.choice_button_text_idle_color = '#888888'
+define gui.choice_button_text_idle_color = "#cccccc"
 define gui.choice_button_text_hover_color = "#ffffff"
-define gui.choice_button_text_insensitive_color = '#8888887f'
+define gui.choice_button_text_insensitive_color = "#444444"
 
 
 ## Boutons des emplacements de fichiers. #######################################
