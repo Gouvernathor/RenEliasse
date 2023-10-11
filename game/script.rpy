@@ -57,7 +57,7 @@ screen main_eliasse():
                             yalign .5
 
                         # texte et présentation de l'amendement
-                        add "#009"
+                        add "#e6e3e3"
 
                         # bouton droit
                         textbutton "➡️":
@@ -65,22 +65,18 @@ screen main_eliasse():
                             yalign .5
 
                 # texte sur lequel l'amendement porte
-                if show_texte:
+                showif show_texte:
                     viewport:
                         scrollbars "vertical"
                         ysize 200
                         vscrollbar_unscrollable "hide"
 
-                        add "#090"
-                        text "(texte)"
-                else:
-                    null
+                        add "#e6e3e3"
+                        text "[[texte]"
 
             # dérouleur
-            if show_derouleur:
-                add Solid("#900", xsize=100)
-            else:
-                null
+            showif show_derouleur:
+                add Solid("#ffb", xsize=100)
 
         # footer
         frame:
