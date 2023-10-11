@@ -8,8 +8,10 @@ call screen main_eliasse
 return
 
 screen main_eliasse():
-    default show_texte = True
+    default show_cosignataires = False
     default show_derouleur = True
+    default show_texte = True
+    default show_text_selection = False
     default refresh = False
 
     # division titre/reste/bottom
@@ -59,8 +61,10 @@ screen main_eliasse():
             yfit True
 
             if refresh:
-                text "Suivi auto activé, [[amdts] adts restants":
+                textbutton "Suivi auto activé, [[amdts] adts restants":
                     xalign .0
+                    action SetScreenVariable("refresh", False)
+
             else:
                 textbutton "Amendement en cours de discussion":
                     xalign .0
@@ -68,9 +72,28 @@ screen main_eliasse():
 
             textbutton "Changer de texte":
                 xalign .5
-                action NullAction()
-                # action Show("text_selection") # needs to be modal
+                action SetScreenVariable("show_text_selection", True)
 
             textbutton "Cosignataires":
                 xalign 1.
-                action NullAction()
+                action SetScreenVariable("show_cosignataires", True)
+
+    if show_text_selection:
+        dismiss action SetScreenVariable("show_text_selection", False)
+
+        frame:
+            xfill False
+            yfill False
+            align (.5, .5)
+
+            text "(sélection du texte)"
+
+    if show_cosignataires:
+        dismiss action SetScreenVariable("show_cosignataires", False)
+
+        frame:
+            xfill False
+            yfill False
+            align (.5, .5)
+
+            text "(cosignataires)"
