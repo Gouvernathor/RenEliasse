@@ -18,65 +18,94 @@ screen main_eliasse():
     side "t c b":
 
         # barre de titre
-        fixed:
-            yfill False
-            yfit True
+        frame:
+            style "gradientedframe"
 
-            text "[[organe]":
-                xalign .0
+            fixed:
+                yfit True
 
-            text "[[titre_texte]":
-                xalign .5
+                text "[[organe]":
+                    xalign .0
 
-            hbox:
-                xalign 1.
+                text "[[titre_texte]":
+                    xalign .5
 
-                # text "(3546 (?))"
+                hbox:
+                    xalign 1.
 
-                textbutton "Texte de référence":
-                    action ToggleScreenVariable("show_texte")
+                    # text "(3546 (?))"
 
-                textbutton "Dérouleur":
-                    action ToggleScreenVariable("show_derouleur")
+                    textbutton "Texte de référence":
+                        action ToggleScreenVariable("show_texte")
+
+                    textbutton "Dérouleur":
+                        action ToggleScreenVariable("show_derouleur")
 
         side "c r":
 
             side "c b":
 
-                add "#009"
+                frame:
+                    background "#fff"
+                    padding (0, 10)
 
+                    side "l c r":
+
+                        # bouton gauche
+                        textbutton "⬅️":
+                            text_size 50
+                            yalign .5
+
+                        # texte et présentation de l'amendement
+                        add "#009"
+
+                        # bouton droit
+                        textbutton "➡️":
+                            text_size 50
+                            yalign .5
+
+                # texte sur lequel l'amendement porte
                 if show_texte:
-                    add Solid("#090", ysize=100)
+                    viewport:
+                        scrollbars "vertical"
+                        ysize 200
+                        vscrollbar_unscrollable "hide"
+
+                        add "#090"
+                        text "(texte)"
                 else:
                     null
 
+            # dérouleur
             if show_derouleur:
                 add Solid("#900", xsize=100)
             else:
                 null
 
         # footer
-        fixed:
-            yfill False
-            yfit True
+        frame:
+            style "gradientedframe"
+            fixed:
+                yfill False
+                yfit True
 
-            if refresh:
-                textbutton "Suivi auto activé, [[amdts] adts restants":
-                    xalign .0
-                    action SetScreenVariable("refresh", False)
+                if refresh:
+                    textbutton "Suivi auto activé, [[amdts] adts restants":
+                        xalign .0
+                        action SetScreenVariable("refresh", False)
 
-            else:
-                textbutton "Amendement en cours de discussion":
-                    xalign .0
-                    action SetScreenVariable("refresh", True)
+                else:
+                    textbutton "Amendement en cours de discussion":
+                        xalign .0
+                        action SetScreenVariable("refresh", True)
 
-            textbutton "Changer de texte":
-                xalign .5
-                action SetScreenVariable("show_text_selection", True)
+                textbutton "Changer de texte":
+                    xalign .5
+                    action SetScreenVariable("show_text_selection", True)
 
-            textbutton "Cosignataires":
-                xalign 1.
-                action SetScreenVariable("show_cosignataires", True)
+                textbutton "Cosignataires":
+                    xalign 1.
+                    action SetScreenVariable("show_cosignataires", True)
 
     if show_text_selection:
         dismiss action SetScreenVariable("show_text_selection", False)
@@ -97,3 +126,6 @@ screen main_eliasse():
             align (.5, .5)
 
             text "(cosignataires)"
+
+style gradientedframe is default:
+    background vgradient("#77f", "#00f")
