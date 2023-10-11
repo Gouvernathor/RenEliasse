@@ -1,17 +1,76 @@
-﻿# Vous pouvez placer le script de votre jeu dans ce fichier.
+﻿define config.rollback_enabled = False
 
-# Déclarez sous cette ligne les images, avec l'instruction 'image'
-# ex: image eileen heureuse = "eileen_heureuse.png"
+label main_menu:
+return
 
-# Déclarez les personnages utilisés dans le jeu.
-define e = Character('Eileen', color="#c8ffc8")
-
-
-# Le jeu commence ici
 label start:
+call screen main_eliasse
+return
 
-    e "Vous venez de créer un nouveau jeu Ren'Py."
+screen main_eliasse():
+    default show_texte = True
+    default show_derouleur = True
+    default refresh = False
 
-    e "Après avoir ajouté une histoire, des images et de la musique, vous pourrez le présenter au monde entier !"
+    # division titre/reste/bottom
+    side "t c b":
 
-    return
+        # barre de titre
+        fixed:
+            yfill False
+            yfit True
+
+            text "[[organe]":
+                xalign .0
+
+            text "[[titre_texte]":
+                xalign .5
+
+            hbox:
+                xalign 1.
+
+                # text "(3546 (?))"
+
+                textbutton "Texte de référence":
+                    action ToggleScreenVariable("show_texte")
+
+                textbutton "Dérouleur":
+                    action ToggleScreenVariable("show_derouleur")
+
+        side "c r":
+
+            side "c b":
+
+                add "#009"
+
+                if show_texte:
+                    add Solid("#090", ysize=100)
+                else:
+                    null
+
+            if show_derouleur:
+                add Solid("#900", xsize=100)
+            else:
+                null
+
+        # footer
+        fixed:
+            yfill False
+            yfit True
+
+            if refresh:
+                text "Suivi auto activé, [[amdts] adts restants":
+                    xalign .0
+            else:
+                textbutton "Amendement en cours de discussion":
+                    xalign .0
+                    action SetScreenVariable("refresh", True)
+
+            textbutton "Changer de texte":
+                xalign .5
+                action NullAction()
+                # action Show("text_selection") # needs to be modal
+
+            textbutton "Cosignataires":
+                xalign 1.
+                action NullAction()
