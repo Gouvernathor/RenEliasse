@@ -3,7 +3,6 @@ import renpy # type: ignore
 """renpy
 init python:
 """
-import collections
 import html
 import re
 import xml.etree.ElementTree as ET
