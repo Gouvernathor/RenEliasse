@@ -1,5 +1,7 @@
-﻿define config.allow_skipping = False
+define config.allow_skipping = False
 define config.rollback_enabled = False
+
+define organes = get_references_organes()
 
 label main_menu:
 return
@@ -36,7 +38,9 @@ screen main_eliasse():
             fixed:
                 yfit True
 
-                text "[[organe]":
+                # en attendant la syntaxe f-string
+                $ nom_organe = organes[organe]
+                text "[nom_organe]":
                     xalign .0
 
                 text "[[titre_texte]":

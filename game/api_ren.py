@@ -7,8 +7,6 @@ import html
 import re
 import xml.etree.ElementTree as ET
 
-# import lxml
-# import lxml.html
 import requests
 
 # URLs disponibles :
@@ -21,10 +19,20 @@ import requests
 # amendement.do                  # done
 # setTexteCookie.do
 # discussionTache.do
-# getListeReferenceDesOrganes.do
+# getListeReferenceDesOrganes.do # done
 # textesOrdreDuJour.do           # done
 # setOrganeCookie.do
 # loadTextContentByBibard.do     # done
+
+def get_references_organes():
+    """
+    Renvoie un dictionnaire {identifiant (str) : nom (str)}.
+    """
+    data = requests.get(
+        "http://eliasse.assemblee-nationale.fr/eliasse/getListeReferenceDesOrganes.do",
+    ).json()
+
+    return {d["value"]: d["text"] for d in data}
 
 def get_prochain_a_discuter(organe="AN"):
     """
