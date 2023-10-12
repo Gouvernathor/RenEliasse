@@ -51,17 +51,25 @@ def get_prochain_a_discuter(organe="AN"):
     "organeAbrv"
         identifiant de l'instance (str)
     """
+    # session = requests.Session()
+    # session.get(
+    #     "http://eliasse.assemblee-nationale.fr/eliasse/setOrganeCookie.do",
+    #     params=dict(
+    #         selectedOrgane=organe,
+    #         checkOrgane=True,
+    #     )
+    # )
+    # en fait inutile, c'est juste qu'il faut avoir le bon cookie ET le bon paramètre
+
     data = requests.get(
         "http://eliasse.assemblee-nationale.fr/eliasse/prochainADiscuter.do",
-        cookies=dict(FOCUSED_ORGANE=organe),
+        cookies=dict(FOSUSED_ORGANE=organe),
+        params=dict(
+            organeAbrv=organe,
+        ),
     ).json()
     prochain_data = data.pop("prochainADiscuter")
     assert not data
-
-    # à tester, des fois ça renvoie celui de l'AN quand on demande une commission...
-    if prochain_data["organeAbrv"] != organe:
-        return None
-
     return prochain_data
 
 def get_textes_ordre_du_jour(organe="AN"):
