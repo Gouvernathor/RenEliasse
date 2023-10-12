@@ -9,15 +9,22 @@ call screen main_eliasse
 return
 
 screen main_eliasse():
-    # options
+    # options d'affichage
     default show_cosignataires = False
     default show_derouleur = True
     default show_texte = True
     default show_text_selection = False
-    default refresh = False
+
+    default suivi_auto = True # visible sur l'interface vanilla
+    default refresh = True    # couper l'utilisation d'internet, en gros (en faire un persistent ?)
 
     # données courantes
+    default organe = "AN"
+    default bibard = None
     default amdt_id = None
+    default amdts_par_art = None # dict[str, list]
+
+    # timer 1 action NullAction() refresh refresh
 
     # division titre/reste/bottom
     side "t c b":
@@ -127,15 +134,15 @@ screen main_eliasse():
                 yfill False
                 yfit True
 
-                if refresh:
+                if suivi_auto:
                     textbutton "Suivi auto activé, [[amdts] adts restants":
                         xalign .0
-                        action SetScreenVariable("refresh", False)
+                        action SetScreenVariable("suivi_auto", False)
 
                 else:
                     textbutton "Amendement en cours de discussion":
                         xalign .0
-                        action SetScreenVariable("refresh", True)
+                        action SetScreenVariable("suivi_auto", True)
 
                 textbutton "Changer de texte":
                     xalign .5
