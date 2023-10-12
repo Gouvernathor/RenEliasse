@@ -9,11 +9,15 @@ call screen main_eliasse
 return
 
 screen main_eliasse():
+    # options
     default show_cosignataires = False
     default show_derouleur = True
     default show_texte = True
     default show_text_selection = False
     default refresh = False
+
+    # données courantes
+    default amdt_id = None
 
     # division titre/reste/bottom
     side "t c b":
@@ -34,7 +38,7 @@ screen main_eliasse():
                 hbox:
                     xalign 1.
 
-                    # text "(3546 (?))"
+                    text "[[bibard]"
 
                     textbutton "Texte de référence":
                         action ToggleScreenVariable("show_texte")
@@ -56,6 +60,7 @@ screen main_eliasse():
                         textbutton "⬅️":
                             text_size 50
                             yalign .5
+                            action NullAction()
 
                         # texte et présentation de l'amendement
                         add "#e6e3e3"
@@ -64,6 +69,7 @@ screen main_eliasse():
                         textbutton "➡️":
                             text_size 50
                             yalign .5
+                            action NullAction()
 
                 # texte sur lequel l'amendement porte
                 showif show_texte:
@@ -77,7 +83,42 @@ screen main_eliasse():
 
             # dérouleur
             showif show_derouleur:
-                add Solid("#ffb", xsize=100)
+                frame:
+                    style "default"
+                    background "#ffb"
+                    xsize 500
+                    yfill True
+
+                    vbox:
+                        frame:
+                            style "gradientedframe"
+                            xfill False
+
+                            fixed:
+                                yfit True
+
+                                # sélecteur d'article
+
+                                text "Dérouleur prévisionnel":
+                                    xalign .5
+
+                                # fermer le dérouleur
+
+                        frame:
+                            style "gradientedframe"
+                            xfill True
+
+                            text "[[article X]":
+                                xalign .5
+
+                        viewport:
+                            scrollbars "vertical"
+                            vscrollbar_unscrollable "hide"
+
+                            null
+                            # for amdt in ():
+                            #     textbutton "[[amdt]":
+                            #         action SetScreenVariable("amdt_id", amdt.id)
 
         # footer
         frame:
