@@ -3,6 +3,17 @@ define config.rollback_enabled = False
 
 define organes = get_references_organes()
 
+# données courantes
+# variables globales pour que les actions y aient accès
+default organe = "AN"
+default ordre_du_jour = None # dict[tuple[str, str], str] # (bibard, suffixe) -> titre
+default bibard = None
+default bibard_suffixe = None
+default titre_texte = None
+default amdts_par_division = None # dict[str, list[amdt]] # divisions triées, amendements aussi
+default nbr_amdts_restants = None
+default amendement = None
+
 label main_menu:
 return
 
@@ -19,12 +30,6 @@ screen main_eliasse():
 
     default suivi_auto = True # visible sur l'interface vanilla
     default refresh = True    # couper l'utilisation d'internet, en gros (en faire un persistent ?)
-
-    # données courantes
-    default organe = "AN"
-    default bibard = None
-    default amdt_id = None
-    default amdts_par_art = None # dict[str, list]
 
     # timer 1 action NullAction() refresh refresh
 
@@ -43,13 +48,13 @@ screen main_eliasse():
                 text "[nom_organe]":
                     xalign .0
 
-                text "[[titre_texte]":
+                text "[titre_texte]":
                     xalign .5
 
                 hbox:
                     xalign 1.
 
-                    text "[[bibard]"
+                    text "([bibard][bibard_suffixe])"
 
                     textbutton "Texte de référence":
                         action ToggleScreenVariable("show_texte")
@@ -129,7 +134,7 @@ screen main_eliasse():
                             null
                             # for amdt in ():
                             #     textbutton "[[amdt]":
-                            #         action SetScreenVariable("amdt_id", amdt.id)
+                            #         action SetVariable("amdt_id", amdt.id)
 
         # footer
         frame:
@@ -139,7 +144,7 @@ screen main_eliasse():
                 yfit True
 
                 if suivi_auto:
-                    textbutton "Suivi auto activé, [[amdts] adts restants":
+                    textbutton "Suivi auto activé, [nbr_amdts_restants] amendements restants":
                         xalign .0
                         action SetScreenVariable("suivi_auto", False)
 
@@ -157,14 +162,83 @@ screen main_eliasse():
                     action SetScreenVariable("show_cosignataires", True)
 
     if show_text_selection:
+        default local_organe = organe
+
         dismiss action SetScreenVariable("show_text_selection", False)
 
         frame:
-            xfill False
+            xsize 1000
             yfill False
             align (.5, .5)
+            modal True
 
-            text "(sélection du texte)"
+            vbox:
+                frame:
+                    style "gradientedframe"
+                    xfill True
+
+                    text "Sélection du texte":
+                        xalign .5
+
+                hbox:
+                    fixed:
+                        yfit True
+                        xsize 200
+
+                        text "Organe"
+
+                    # en attendant la syntaxe f-string
+                    $ nom_organe = organes[local_organe]
+                    textbutton "[nom_organe]":
+                        xfill True
+                        text_size 25
+                        action CaptureFocus("organes_drop")
+
+                hbox:
+                    fixed:
+                        yfit True
+                        xsize 200
+
+                        text "Texte"
+
+                    textbutton "[titre_texte]":
+                        xfill True
+                        text_size 25
+                        action CaptureFocus("textes_drop")
+
+    if GetFocusRect("organes_drop"):
+        dismiss action ClearFocus("organes_drop")
+
+        nearrect:
+            focus "organes_drop"
+
+            frame:
+                modal True
+                style "dropdownframe"
+                has vbox
+
+                for organe_id, organe_name in organes.items():
+                    textbutton "[organe_name]":
+                        text_size 25
+                        if organe_id != local_organe:
+                            action [SetScreenVariable("local_organe", organe_id), ClearFocus("organes_drop")]
+
+    if GetFocusRect("textes_drop"):
+        dismiss action ClearFocus("textes_drop")
+
+        nearrect:
+            focus "textes_drop"
+
+            frame:
+                modal True
+                style "dropdownframe"
+                has vbox
+
+                for odj_el in get_textes_ordre_du_jour(local_organe):
+                    textbutton "[odj_el[textTitre]]":
+                        text_size 25
+                        if odj_el["textBibard"] != bibard:
+                            action NullAction()
 
     if show_cosignataires:
         dismiss action SetScreenVariable("show_cosignataires", False)
@@ -178,3 +252,169 @@ screen main_eliasse():
 
 style gradientedframe is default:
     background vgradient("#77f", "#00f")
+
+style dropdownframe is default:
+    background Frame(
+        Fixed(
+            Solid("#000", xysize=(10, 10)),
+            Solid("#fff", xysize=(8, 8), align=(.5, .5)),
+            fit_first=True),
+        4, 4)
+    padding (4, 4)
+
+init python:
+    @renpy.pure
+    class SetOrgane(Action):
+        def __init__(self, organe):
+            self.organe = organe
+
+        def __call__(self):
+            store.organe = self.organe
+            renpy.run(ActuateOrdreDuJour())
+
+            store.bibard = store.bibard_suffixe = store.titre_texte = store.amdts_par_division = store.amendement = None
+
+        def get_sensitive(self):
+            return (organe != self.organe) and (organe in organes)
+
+        def get_selected(self):
+            return organe == self.organe
+
+    class ActuateOrdreDuJour(Action):
+        """
+        Actualise l'ordre du jour sans réinitialiser les données liées
+        au texte et à l'amendement courants.
+        """
+        def __call__(self):
+            store.ordre_du_jour = get_ordre_du_jour(organe)
+
+    class ActuateProchain(Action):
+        """
+        Fait toute l'actualisation du prochain texte et amendement à discuter pour l'organe courant.
+        """
+        def __call__(self):
+            prochain_data = get_prochain_a_discuter(organe)
+            prochain_bibard = prochain_data["bibard"]
+            prochain_suffixe = prochain_data["bibardSuffixe"]
+            prochain_amdt_num = prochain_data["numAmdt"]
+
+            if (not ordre_du_jour) or ((prochain_bibard, prochain_suffixe) not in ordre_du_jour):
+                renpy.run(ActuateOrdreDuJour())
+
+            actuated = False # pour ne pas run ActuateAmdts deux fois
+
+            text_action = SetText(prochain_bibard, prochain_suffixe)
+            if renpy.is_sensitive(text_action):
+                renpy.run(text_action)
+                actuated = True
+
+            if (amendement is None) or (amendement["numero"] != prochain_amdt_num):
+                if not actuated:
+                    renpy.run(ActuateAmdts())
+                renpy.run(SetAmendement(prochain_amdt_num))
+
+    @renpy.pure
+    class SetText(Action):
+        def __init__(self, bibard, suffixe=""):
+            self.bibard = bibard
+            self.suffixe = suffixe
+
+        def __call__(self):
+            store.bibard = self.bibard
+            store.bibard_suffixe = self.suffixe
+            store.titre_texte = ordre_du_jour[bibard, bibard_suffixe]
+            renpy.run(ActuateAmdts())
+
+            store.amendement = None
+
+        def get_sensitive(self):
+            return ((bibard != self.bibard) or (bibard_suffixe != self.suffixe))\
+                and ordre_du_jour and ((self.bibard, self.suffixe) in ordre_du_jour)
+
+        def get_selected(self):
+            return (bibard == self.bibard) and (bibard_suffixe == self.suffixe)
+
+    class ActuateAmdts(Action):
+        """
+        Actualise certaines données liées aux amendements liés au texte courant :
+        amdts_par_division et nbr_amdts_restants.
+        """
+        def __call__(self):
+            discussion = get_discussion(
+                bibard=bibard,
+                bibard_suffixe=bibard_suffixe,
+                organe_abrv=organe,
+            )
+
+            store.nbr_amdts_restants = discussion["nbrAmdtRestant"]
+
+            # liste de dicts
+            divisions_raw = discussion["divisions"]
+            # liste de "place" des divisions triées par "position"
+            divisions = [d["place"] for d in sorted(divisions_raw, key=lambda d: d["position"])]
+
+            # garantir l'ordre des divisions, puis modification par effet de bord
+            # dict[str, list[amdt]] # divisions triées, amendements aussi
+            store.amdts_par_division = amdts_par_division = {d : [] for d in divisions}
+            for amdt in discussion["amendements"]:
+                amdts_par_division[amdt["place"]].append(amdt)
+            for dn, amdts in amdts_par_division.items():
+                amdts.sort(key=lambda a: a["position"])
+
+        def get_sensitive(self):
+            return bibard is not None
+
+    @renpy.pure
+    class SetDivision(Action):
+        """
+        En réalité, change l'amendement, comme SetAmendement.
+        """
+        def __init__(self, div):
+            self.div = div
+
+        def __call__(self):
+            store.amendement = get_amendement(
+                store.amdts_par_division[self.div][0]["numero"],
+                bibard=bibard,
+                bibard_suffixe=bibard_suffixe,
+                organe_abrv=organe,
+            )
+
+        def get_sensitive(self):
+            return (bibard is not None) and ((amendement is None) or (amendement["place"] != self.div)) and (self.div in amdts_par_division)
+
+        def get_selected(self):
+            return (amendement is not None) and (amendement["place"] == self.div)
+
+    @renpy.pure
+    class SetAmendement(Action):
+        def __init__(self, amdt):
+            self.amdt_num = amdt
+
+        def __call__(self):
+            store.amendement = get_amendement(
+                self.amdt_num,
+                bibard=bibard,
+                bibard_suffixe=bibard_suffixe,
+                organe_abrv=organe,
+            )
+
+        def get_sensitive(self):
+            return ((amendement is None) or (amendement["numero"] != self.amdt_num))
+            # numero ou numeroLong ou numeroReference
+
+        def get_selected(self):
+            return (amendement is not None) and (amendement["numero"] == self.amdt_num)
+            # idem
+
+    class ActuateAmendement(Action):
+        def __call__(self):
+            store.amendement = get_amendement(
+                amendement["numero"], # idem
+                bibard=bibard,
+                bibard_suffixe=bibard_suffixe,
+                organe_abrv=organe,
+            )
+
+        def get_sensitive(self):
+            return (bibard is not None) and (amendement is not None)
