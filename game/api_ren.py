@@ -14,8 +14,8 @@ import requests
 # prochainADiscuter.do           # done
 # getParametresStatiques.do
 # getVersionLivrable.do
-# amdtDerouleur.do
-# discussion.do
+# amdtDerouleur.do               # inutile avec discussion.do (mêmes params, renvoie l'élément "amendements")
+# discussion.do                  # done
 # amendement.do                  # done
 # setTexteCookie.do
 # discussionTache.do
@@ -92,6 +92,71 @@ def get_textes_ordre_du_jour(organe="AN"):
         ),
     ).json()
 
+    return data
+
+def get_ordre_du_jour(organe="AN"):
+    """
+    Renvoie un dictionnaire {(bibard, suffixe): titre}
+    """
+    return {(o["textBibard"], o["textBibardSuffixe"]): o["textTitre"] for o in get_textes_ordre_du_jour(organe)}
+
+def get_discussion(bibard, *, bibard_suffixe="", organe_abrv="AN", legislature=16):
+    """
+    Renvoie un dict avec des clés diverses.
+
+    (non exhaustif)
+    "amendements"
+        une liste de dicts d'amendement, avec les clés suivantes (non exhaustif) :
+        "alineaLabel"
+            semble donner des infos sur l'alinea concerné,
+            avec S pour les amendements de suppression,
+            "" pour les articles additionnels ou le titre...
+        "auteurGroupe"
+            abbréviation du groupe de l'auteur (lourd potentiel)
+        "auteurLabel"
+            nom de l'auteur, prêt à l'affichage dans la liste dérouleur
+        "discussionCommune"
+            identifiant de discussion commune, ou ""
+        "discussionIdentique"
+            identifiant de groupe d'amendements identiques, ou ""
+        "numero"
+            numéro officiel de l'amendement
+        "parentNumero"
+            (probablement) pour les sous-amendements, numéro officiel du parent
+        "place"
+            identifiant de division, voir plus loin
+            propre à l'affichage *et* unique, apparemment
+        "position"
+            clé de tri des amendements (à la fois en int et en alphabétique)
+        "sort"
+            sort en toutes lettres en séance, ou "" avant (et pendant) l'exament de l'amendement
+    "divisions"
+        liste d'endroits où des amendements peuvent être placés
+        deux clés utiles (la troisième est null) :
+        "place"
+            identifiant lisible qu'on retrouve dans les amendements, plus haut
+        "position"
+            clé de tri des divisions (à la fois en int et en alphabétique)
+    "nbrAmdtRestant"
+        nombre d'amendements restants, str à passer par int
+    "type"
+        type de texte, comme "projet de loi" ou "proposition de loi"
+    "bibard"
+    "bibardSuffixe"
+    "legislature"
+    "organe"
+    "titre"
+        relatifs au texte
+    """
+    data, = requests.get(
+        "http://eliasse.assemblee-nationale.fr/eliasse/discussion.do",
+        params=dict(
+            bibard=bibard,
+            bibardSuffixe=bibard_suffixe,
+            organeAbrv=organe_abrv,
+            legislature=legislature,
+        ),
+    ).json().values()
     return data
 
 def get_amendement(num_amdt, bibard, *, bibard_suffixe="", organe_abrv="AN", legislature=16):
