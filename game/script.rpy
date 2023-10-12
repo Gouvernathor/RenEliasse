@@ -76,16 +76,16 @@ screen main_eliasse():
                         textbutton "⬅️":
                             text_size 50
                             yalign .5
-                            action NullAction()
+                            action NullAction() # TODO
 
                         # texte et présentation de l'amendement
-                        add "#e6e3e3"
+                        add "#e6e3e3" # TODO
 
                         # bouton droit
                         textbutton "➡️":
                             text_size 50
                             yalign .5
-                            action NullAction()
+                            action NullAction() # TODO
 
                 # texte sur lequel l'amendement porte
                 showif show_texte:
@@ -95,7 +95,7 @@ screen main_eliasse():
                         vscrollbar_unscrollable "hide"
 
                         add "#e6e3e3"
-                        text "[[texte]"
+                        text "[[texte]" # TODO
 
             # dérouleur
             showif show_derouleur:
@@ -113,25 +113,25 @@ screen main_eliasse():
                             fixed:
                                 yfit True
 
-                                # sélecteur d'article
+                                # sélecteur d'article # TODO
 
                                 text "Dérouleur prévisionnel":
                                     xalign .5
 
-                                # fermer le dérouleur
+                                # fermer le dérouleur # TODO
 
                         frame:
                             style "gradientedframe"
                             xfill True
 
-                            text "[[article X]":
+                            text "[[article X]": # TODO
                                 xalign .5
 
                         viewport:
                             scrollbars "vertical"
                             vscrollbar_unscrollable "hide"
 
-                            null
+                            null # TODO
                             # for amdt in ():
                             #     textbutton "[[amdt]":
                             #         action SetVariable("amdt_id", amdt.id)
@@ -248,7 +248,7 @@ screen main_eliasse():
             yfill False
             align (.5, .5)
 
-            text "(cosignataires)"
+            text "(cosignataires)" # TODO
 
 style gradientedframe is default:
     background vgradient("#77f", "#00f")
