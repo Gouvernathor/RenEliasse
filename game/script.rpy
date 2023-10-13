@@ -42,7 +42,8 @@ screen main_eliasse():
         else:
             division = None
 
-    # timer 1 action ActuateProchain() refresh refresh
+    if suivi_auto:
+        timer 3 action ActuateProchain() repeat True
 
     # division titre/reste/bottom
     side "t c b":
@@ -166,7 +167,7 @@ screen main_eliasse():
                 else:
                     textbutton "Amendement en cours de discussion":
                         xalign .0
-                        action SetScreenVariable("suivi_auto", True)
+                        action [SetScreenVariable("suivi_auto", True), ActuateProchain()]
 
                 textbutton "Changer de texte":
                     xalign .5
@@ -253,7 +254,7 @@ screen main_eliasse():
                     textbutton "[odj_el[textTitre]]":
                         text_size 25
                         if odj_el["textBibard"] != bibard:
-                            action NullAction()
+                            action NullAction() # TODO
 
     if show_cosignataires:
         dismiss action SetScreenVariable("show_cosignataires", False)
