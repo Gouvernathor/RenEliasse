@@ -88,7 +88,7 @@ screen main_eliasse():
                             action NullAction() # TODO
 
                 # texte sur lequel l'amendement porte
-                showif show_texte:
+                if show_texte:
                     viewport:
                         scrollbars "vertical"
                         ysize 200
@@ -96,9 +96,11 @@ screen main_eliasse():
 
                         add "#e6e3e3"
                         text "[[texte]" # TODO
+                else:
+                    null
 
             # dérouleur
-            showif show_derouleur:
+            if show_derouleur:
                 frame:
                     style "default"
                     background "#ffb"
@@ -135,6 +137,8 @@ screen main_eliasse():
                             # for amdt in ():
                             #     textbutton "[[amdt]":
                             #         action SetVariable("amdt_id", amdt.id)
+            else:
+                null
 
         # footer
         frame:
