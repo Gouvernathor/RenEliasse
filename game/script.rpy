@@ -416,17 +416,15 @@ init python:
             )
 
         def get_sensitive(self):
-            return ((amendement is None) or (amendement["numero"] != self.amdt_num))
-            # numero ou numeroLong ou numeroReference
+            return ((amendement is None) or (amendement["numeroReference"] != self.amdt_num))
 
         def get_selected(self):
-            return (amendement is not None) and (amendement["numero"] == self.amdt_num)
-            # idem
+            return (amendement is not None) and (amendement["numeroReference"] == self.amdt_num)
 
     class ActuateAmendement(Action):
         def __call__(self):
             store.amendement = get_amendement(
-                amendement["numero"], # idem
+                amendement["numeroReference"],
                 bibard=bibard,
                 bibard_suffixe=bibard_suffixe,
                 organe_abrv=organe,
