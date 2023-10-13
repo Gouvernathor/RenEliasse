@@ -289,6 +289,8 @@ init python:
 
             store.bibard = store.bibard_suffixe = store.titre_texte = store.amdts_par_division = store.amendement = None
 
+            renpy.restart_interaction()
+
         def get_sensitive(self):
             return (organe != self.organe) and (organe in organes)
 
@@ -302,6 +304,8 @@ init python:
         """
         def __call__(self):
             store.ordre_du_jour = get_ordre_du_jour(organe)
+
+            renpy.restart_interaction()
 
     class ActuateProchain(Action):
         """
@@ -328,6 +332,8 @@ init python:
                     renpy.run(ActuateAmdts())
                 renpy.run(SetAmendement(prochain_amdt_num))
 
+            renpy.restart_interaction()
+
     @renpy.pure
     class SetText(Action):
         def __init__(self, bibard, suffixe=""):
@@ -341,6 +347,8 @@ init python:
             renpy.run(ActuateAmdts())
 
             store.amendement = None
+
+            renpy.restart_interaction()
 
         def get_sensitive(self):
             return ((bibard != self.bibard) or (bibard_suffixe != self.suffixe))\
@@ -376,6 +384,8 @@ init python:
             for dn, amdts in amdts_par_division.items():
                 amdts.sort(key=lambda a: a["position"])
 
+            renpy.restart_interaction()
+
         def get_sensitive(self):
             return bibard is not None
 
@@ -396,6 +406,8 @@ init python:
                     organe_abrv=organe,
                 )
 
+            renpy.restart_interaction()
+
         def get_sensitive(self):
             return (bibard is not None) and amdts_par_division and (self.div in amdts_par_division) # and ((amendement is None) or (amendement["place"] != self.div))
 
@@ -415,6 +427,8 @@ init python:
                 organe_abrv=organe,
             )
 
+            renpy.restart_interaction()
+
         def get_sensitive(self):
             return ((amendement is None) or (amendement["numeroReference"] != self.amdt_num))
 
@@ -429,6 +443,8 @@ init python:
                 bibard_suffixe=bibard_suffixe,
                 organe_abrv=organe,
             )
+
+            renpy.restart_interaction()
 
         def get_sensitive(self):
             return (bibard is not None) and (amendement is not None)
