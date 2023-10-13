@@ -142,13 +142,44 @@ screen main_eliasse():
                                 xalign .5
 
                         viewport:
-                            scrollbars "vertical"
+                            scrollbars "vertical" # mettre les scrollbar séparément par-dessus et ajouter une marge à droite du texte dans le bouton # TODO
                             vscrollbar_unscrollable "hide"
+                            mousewheel True
 
-                            null # TODO
-                            # for amdt in ():
-                            #     textbutton "[[amdt]":
-                            #         action SetVariable("amdt_id", amdt.id)
+                            has vbox
+
+                            if amdts_par_division:
+                                for amdt index amdt["numero"] in amdts_par_division[division]:
+                                    button:
+                                        action [SetScreenVariable("suivi_auto", False), SelectedIf(SetAmendement(amdt["numero"]))]
+                                        selected_background "#c2ddf2"
+
+                                        fixed:
+                                            fit_first "height"
+
+                                            text "[amdt[auteurLabel]] ([amdt[auteurGroupe]])":
+                                                size 20
+                                                xalign 1.
+                                                layout "subtitle"
+                                                textalign 1.
+                                                xmaximum 300
+
+                                            hbox:
+                                                yalign .5
+
+                                                # marqueurs discussion commune et identique # TODO
+
+                                                if amdt["parentNumero"]:
+                                                    $ amdtnum = "SS-Adt n°"
+                                                else:
+                                                    $ amdtnum = "Adt n°"
+                                                $ amdtnum += amdt["numero"]
+                                                text "[amdtnum]" size 20
+
+                                                # marqueurs sous-amendements discussion commune et identique # TODO
+                            else:
+                                null
+
             else:
                 null
 
