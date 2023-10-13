@@ -1,4 +1,4 @@
-﻿define config.allow_skipping = False
+define config.allow_skipping = False
 define config.rollback_enabled = False
 
 define organes = get_references_organes()
@@ -377,15 +377,16 @@ init python:
             self.div = div
 
         def __call__(self):
-            store.amendement = get_amendement(
-                store.amdts_par_division[self.div][0]["numero"],
-                bibard=bibard,
-                bibard_suffixe=bibard_suffixe,
-                organe_abrv=organe,
-            )
+            if not self.get_selected():
+                store.amendement = get_amendement(
+                    store.amdts_par_division[self.div][0]["numero"],
+                    bibard=bibard,
+                    bibard_suffixe=bibard_suffixe,
+                    organe_abrv=organe,
+                )
 
         def get_sensitive(self):
-            return (bibard is not None) and ((amendement is None) or (amendement["place"] != self.div)) and (self.div in amdts_par_division)
+            return (bibard is not None) and amdts_par_division and (self.div in amdts_par_division) # and ((amendement is None) or (amendement["place"] != self.div))
 
         def get_selected(self):
             return (amendement is not None) and (amendement["place"] == self.div)
