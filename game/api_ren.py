@@ -160,6 +160,63 @@ def get_discussion(bibard, *, bibard_suffixe="", organe_abrv="AN", legislature=1
     return data
 
 def get_amendement(num_amdt, bibard, *, bibard_suffixe="", organe_abrv="AN", legislature=16):
+    """
+    Renvoie un dict assez énorme, avec beaucoup de clés.
+
+    (non exhaustif)
+    "placeReference"
+        identifiant de division, voir get_discussion
+    "ancreDivisionTexteVise"
+        autre identifiant de la même division, pour le texte de référence
+    "place"
+        le même emplacement, écrit en HTML
+    "division"
+        un dict avec quelques clés toutes moins utiles que placeReference
+    "dispositif"
+        le texte de l'amendement proprement dit, en HTML
+    "exposeSommaire"
+        l'exposé sommaire, en HTML
+    "auteur"
+        diverses infos sur l'auteur (non exhaustif) :
+        "auteurLabel"
+            nom de l'auteur prêt à afficher
+        "qualite"
+            (probablement) généralement None, mais contient des choses pour le rapporteur et le gouvernement
+        "estGouvernement"
+            (probablement) un flag, "0" si non (donc on doit passer par int()...)
+        "estRapporteur"
+            (probablement) idem
+    "cosignataires"
+        liste de dicts semblables à "auteur", sauf que estGouvernement et estRapporteur sont toujours ""
+    "listeDesSignataires"
+        string rassemblant tous les signataires, prêt à afficher
+    "sortEnSeance"
+        comme "sort" pour get_discussion
+    "numeroParent"
+        (probablement) comme "parentNumero" pour get_discussion
+    "numero"
+    "numeroLong"
+    "numeroReference"
+        numero est strictement numérique (mais toujours un str)
+        Long peut contenir le " (Rect)"
+        en commission, numeroReference commence par une ou des lettres
+        en séance, numeroReference est égal à numero
+    "position"
+        comme dans get_discussion
+    "bibard"
+    "bibardSuffixe"
+    "legislature"
+    "organeAbrv"
+        relatifs au texte
+    "texte"
+        d'autres infos relatives au texte, dans un dict :
+        "numBibard"
+        "numeroLegislature"
+            toujours pareil
+        "titre"
+        "titreCourt"
+            les deux sont en fullcaps
+    """
     data = requests.get(
         "http://eliasse.assemblee-nationale.fr/eliasse/amendement.do",
         params=dict(
