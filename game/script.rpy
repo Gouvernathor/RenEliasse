@@ -1,4 +1,4 @@
-define config.allow_skipping = False
+﻿define config.allow_skipping = False
 define config.rollback_enabled = False
 
 define organes = get_references_organes()
@@ -31,7 +31,15 @@ screen main_eliasse():
     default suivi_auto = True # visible sur l'interface vanilla
     default refresh = True    # couper l'utilisation d'internet, en gros (en faire un persistent ?)
 
-    # timer 1 action NullAction() refresh refresh
+    python: # actualisation régulière
+        if amendement:
+            division = amendement["placeReference"]
+        elif amdts_par_division:
+            division = next(iter(amdts_par_division))
+        else:
+            division = None
+
+    # timer 1 action ActuateProchain() refresh refresh
 
     # division titre/reste/bottom
     side "t c b":
@@ -115,18 +123,18 @@ screen main_eliasse():
                             fixed:
                                 yfit True
 
-                                # sélecteur d'article # TODO
+                                # sélecteur de division # TODO
 
                                 text "Dérouleur prévisionnel":
                                     xalign .5
 
-                                # fermer le dérouleur # TODO
+                                # fermer le dérouleur (pas vraiment nécessaire, il y a le bouton juste au-dessus)
 
                         frame:
                             style "gradientedframe"
                             xfill True
 
-                            text "[[article X]": # TODO
+                            text "[division]":
                                 xalign .5
 
                         viewport:
