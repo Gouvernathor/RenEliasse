@@ -1,5 +1,8 @@
-﻿define config.allow_skipping = False
+define config.allow_skipping = False
 define config.rollback_enabled = False
+
+style default:
+    hinting "bytecode"
 
 define organes = get_references_organes()
 
