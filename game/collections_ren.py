@@ -1,38 +1,14 @@
 import renpy # type: ignore
+python_object = object
+python_dict = dict
 
 """renpy
 init python:
 """
 import collections
 
-# class LockableOrderedDict(collections.OrderedDict):
-class LockableOrderedDict(dict):
-    locked = False
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.locked = bool(args or kwargs)
-
-    def __setitem__(self, key, value, /):
-        if self.locked and (key not in self):
-            raise KeyError(f"{key} is not a valid key for this dict")
-        return super().__setitem__(key, value)
-
-    def __delitem__(self, key, /):
-        if self.locked:
-            raise Exception("Cannot remove an item from a locked dict")
-        return super().__delitem__(key)
-
-    def pop(self, key, /, *args):
-        if self.locked:
-            raise Exception("Cannot remove an item from a locked dict")
-        return super().pop(key, *args)
-
-    @classmethod
-    def fromkeys(cls, iterable, value=None):
-        rv = super().fromkeys(iterable, value)
-        rv.locked = True
-        return rv
+class InsertableDictMixin(python_object):
+    __slots__ = ()
 
     def insert(self, existing_key, new_key, value, *, before=True):
         """
@@ -62,6 +38,26 @@ class LockableOrderedDict(dict):
 
     def insert_after(self, existing_key, new_key, value):
         return self.insert(existing_key, new_key, value, before=False)
+
+# class LockableOrderedDict(collections.OrderedDict):
+class LockableOrderedDict(python_dict, InsertableDictMixin):
+    __slots__ = ("locked")
+
+    def __init__(self, *args, **kwargs):
+        self.locked = False
+        super().__init__(*args, **kwargs)
+        self.locked = bool(args or kwargs)
+
+    def __setitem__(self, key, value, /):
+        if self.locked and (key not in self):
+            raise KeyError(f"{key} is not a valid key for this dict")
+        return super().__setitem__(key, value)
+
+    @classmethod
+    def fromkeys(cls, iterable, value=None):
+        rv = super().fromkeys(iterable, value)
+        rv.locked = True
+        return rv
 
 def locked_wrap(func):
     def wrapper(self, *args, **kwargs):
