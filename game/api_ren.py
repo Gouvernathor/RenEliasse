@@ -159,9 +159,14 @@ def get_discussion(bibard, *, bibard_suffixe="", organe_abrv="AN", legislature=1
     ).json().values()
     return data
 
-def get_amendement(num_amdt, bibard, *, bibard_suffixe="", organe_abrv="AN", legislature=16):
+__amendement_cache = {} # {(num_amdt, bibard, bibard_suffixe, organe_abrv) -> dict_amendement}
+
+def get_amendement(num_amdt, bibard, *, bibard_suffixe="", organe_abrv="AN", legislature=16, force=False):
     """
     Renvoie un dict assez énorme, avec beaucoup de clés.
+
+    Pour éviter les refresh très lents, il y a un cache, mais on peut le bypass
+    en passant force=True.
 
     (non exhaustif)
     "placeReference"
@@ -217,6 +222,11 @@ def get_amendement(num_amdt, bibard, *, bibard_suffixe="", organe_abrv="AN", leg
         "titreCourt"
             les deux sont en fullcaps
     """
+    if not force:
+        rv = __amendement_cache.get((num_amdt, bibard, bibard_suffixe, organe_abrv))
+        if rv is not None:
+            return rv
+
     data = requests.get(
         "http://eliasse.assemblee-nationale.fr/eliasse/amendement.do",
         params=dict(
@@ -229,6 +239,9 @@ def get_amendement(num_amdt, bibard, *, bibard_suffixe="", organe_abrv="AN", leg
     ).json()
     amendement, = data.pop("amendements")
     assert not data
+
+    __amendement_cache[(num_amdt, bibard, bibard_suffixe, organe_abrv)] = amendement
+
     return amendement
 
 def get_2_textes_de_reference(amendement):
