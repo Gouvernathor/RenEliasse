@@ -6,6 +6,8 @@ style default:
 
 define organes = get_references_organes()
 
+define refresh_rate = 3
+
 # données courantes
 # variables globales pour que les actions y aient accès
 default organe = "AN"
@@ -43,7 +45,7 @@ screen main_eliasse():
             division = None
 
     if suivi_auto:
-        timer 3 action ActuateProchain() repeat True
+        timer refresh_rate action ActuateProchain() repeat True
 
     # division titre/reste/bottom
     side "t c b":
