@@ -1,4 +1,4 @@
-define config.allow_skipping = False
+﻿define config.allow_skipping = False
 define config.rollback_enabled = False
 
 style default:
@@ -44,8 +44,7 @@ screen main_eliasse():
         else:
             division = None
 
-    if suivi_auto:
-        timer refresh_rate action ActuateProchain() repeat True
+    timer refresh_rate action ActuateProchain() repeat suivi_auto
 
     # division titre/reste/bottom
     side "t c b":
@@ -153,14 +152,16 @@ screen main_eliasse():
                             if amdts_par_division:
                                 for amdt index amdt["numero"] in amdts_par_division[division]:
                                     button:
+                                        style "default"
                                         action [SetScreenVariable("suivi_auto", False), SelectedIf(SetAmendement(amdt["numero"]))]
                                         selected_background "#c2ddf2"
+                                        # couleur des amendements désactivés et hover # TODO
 
                                         fixed:
                                             fit_first "height"
 
                                             text "[amdt[auteurLabel]] ([amdt[auteurGroupe]])":
-                                                size 20
+                                                size 25
                                                 xalign 1.
                                                 layout "subtitle"
                                                 textalign 1.
@@ -169,16 +170,40 @@ screen main_eliasse():
                                             hbox:
                                                 yalign .5
 
-                                                # marqueurs discussion commune et identique # TODO
+
+                                                # marqueur commune
+                                                fixed:
+                                                    style_prefix "commune_identique"
+                                                    if amdt["discussionCommuneAmdtPositon"] == "debut":
+                                                        text "┏"
+                                                    elif amdt["discussionCommuneAmdtPositon"] == "milieu":
+                                                        if amdt["discussionIdentiqueAmdtPositon"] in ("", "debut"):
+                                                            text "┣"
+                                                        else:
+                                                            text "┃"
+                                                    elif amdt["discussionCommuneAmdtPositon"] == "fin":
+                                                        text "┗"
+                                                # marqueur identique
+                                                fixed:
+                                                    style_prefix "commune_identique"
+                                                    if amdt["discussionIdentiqueAmdtPositon"] == "debut":
+                                                        text "╔"
+                                                    elif amdt["discussionIdentiqueAmdtPositon"] == "milieu":
+                                                        text "╠"
+                                                    elif amdt["discussionIdentiqueAmdtPositon"] == "fin":
+                                                        text "╚"
 
                                                 if amdt["parentNumero"]:
                                                     $ amdtnum = "SS-Adt n°"
                                                 else:
                                                     $ amdtnum = "Adt n°"
                                                 $ amdtnum += amdt["numero"]
-                                                text "[amdtnum]" size 20
+                                                text "[amdtnum]" size 25
 
-                                                # marqueurs sous-amendements discussion commune et identique # TODO
+
+                                                # TODO
+                                                # marqueur sous-amendements identique
+                                                # marqueur sous-amendements commune
                             else:
                                 null
 
@@ -310,6 +335,16 @@ style dropdownframe is default:
             fit_first=True),
         4, 4)
     padding (4, 4)
+
+# TODO # do a style pass
+
+style commune_identique_fixed:
+    yfill False
+    xsize 20
+
+style commune_identique_text:
+    font "DejaVuSans.ttf"
+    size 25
 
 init python:
     @renpy.pure
